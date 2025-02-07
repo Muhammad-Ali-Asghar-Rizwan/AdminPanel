@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FiMail, FiLock, FiUser } from "react-icons/fi";
+import { FiMail, FiLock,  } from "react-icons/fi";
 import Swal from 'sweetalert2';
 
 export default function AdminLogin() {
