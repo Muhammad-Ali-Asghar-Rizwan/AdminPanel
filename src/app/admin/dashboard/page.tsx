@@ -46,7 +46,7 @@ export default function AdminDashboard() {
           status,
           cartItems[]->{
             productName,
-            imageUrl
+            image
           }
         }`
       )
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
                       <p><strong>City:</strong> {order.city}</p>
                       <p><strong>Total Amount:</strong> ${order.total}</p>
                     </div>
-                    <ul className="mt-4 space-y-2">
+                    {/* <ul className="mt-4 space-y-2">
                             {order.cartItems.map((item, index) => (
                               <li key={`${order._id}-${index}`} className="flex items-center gap-2">
                                 {item.imageUrl && (
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
                                 <span>{item.productName}</span>
                               </li>
                             ))}
-                          </ul>
+                          </ul> */}
                   </td>
                 </tr>
               )}
