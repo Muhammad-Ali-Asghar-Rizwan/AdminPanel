@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import { client } from "@/sanity/lib/client";
-// import Image from "next/image";
-// import { urlFor } from "@/sanity/lib/image";
+import Image from "next/image";
 import Swal from "sweetalert2";
 import ProtectedRoute from "@/app/component/ProtectedRoute";
+import { urlFor } from "@/sanity/lib/image";
 
 interface Order {
   _id: string;
@@ -19,7 +19,8 @@ interface Order {
   discount: number;
   orderDate: string;
   status: string | null;
-  cartItems: { productName: string; image: string }[];
+  ImageUrl:string;
+  cartItems: { productName: string; imageUrl: string }[];
 }
 
 export default function AdminDashboard() {
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
           status,
           cartItems[]->{
             productName,
-            image
+            imageUrl
           }
         }`
       )
@@ -113,94 +114,94 @@ export default function AdminDashboard() {
     <ProtectedRoute>
       <div className="flex flex-col h-screen bg-gray-50">
         {/* Navbar */}
-        <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">Admin Dashboard</h2>
-          <div className="flex space-x-4">
-            {["All", "pending", "dispatch", "success"].map((status) => (
-              <button
-                key={status}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  filter === status ? "bg-blue-600 text-white font-bold" : "text-gray-700 hover:bg-gray-100"
-                }`}
-                onClick={() => setFilter(status)}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
-        </nav>
+       
+
+<nav className="bg-blue-700 text-white shadow-md p-4 flex flex-wrap justify-between items-center">
+  <h2 className="text-2xl font-bold">Admin Dashboard</h2>
+  <div className="flex flex-wrap space-x-1 mt-6 gap-3">
+    {["All", "pending", "dispatch", "success"].map((status) => (
+      <button
+        key={status}
+        className={`px-4 py-2 rounded-lg transition-all ${
+          filter === status ? "bg-blue-500 text-white font-bold" : "text-white hover:bg-gray-100 hover:text-gray-700"
+        }`}
+        onClick={() => setFilter(status)}
+      >
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </button>
+    ))}
+  </div>
+</nav>
+
 
         {/* Orders Table */}
         <div className="flex-1 p-6 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Orders</h2>
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+  <h2 className="text-2xl font-bold mb-6 text-gray-800">Orders</h2>
+  <div className="bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            {["ID", "Customer", "Address", "Total", "Status", "Action"].map((heading) => (
+              <th key={heading} className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                {heading}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {filteredOrders.map((order) => (
+            <React.Fragment key={order._id}>
+              <tr
+                className="hover:bg-gradient-to-r from-blue-50 to-blue-100 transition-all cursor-pointer"
+                onClick={() => toggleOrderDetails(order._id)}
+              >
+                <td className="px-6 py-4 text-sm text-gray-700">{order._id}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{order.firstName} {order.lastName}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">{order.address}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">${order.total}</td>
+                <td className="px-6 py-4 text-sm">
+                  <select
+                    value={order.status || ""}
+                    onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                    className="bg-gray-100 p-1 rounded text-sm"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="dispatch">Dispatch</option>
+                    <option value="success">Completed</option>
+                  </select>
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(order._id);
+                    }}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+              {selectedOrderId === order._id && (
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredOrders.map((order) => (
-                  <React.Fragment key={order._id}>
-                    <tr
-                      className="hover:bg-gray-50 transition-all cursor-pointer"
-                      onClick={() => toggleOrderDetails(order._id)}
-                    >
-                      <td className="px-6 py-4 text-sm text-gray-900">{order._id}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{order.firstName} {order.lastName}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{order.address}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{new Date(order.orderDate).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">${order.total}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <select
-                          value={order.status || ""}
-                          onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                          className="bg-gray-100 p-1 rounded text-sm"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="dispatch">Dispatch</option>
-                          <option value="success">Completed</option>
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(order._id);
-                          }}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                    {selectedOrderId === order._id && (
-                      <tr>
-                        <td colSpan={7} className="bg-gray-50 p-4 transition-all animate-fadeIn">
-                          <h3 className="font-bold text-lg text-gray-800 mb-2">Order Details</h3>
-                          <div className="grid grid-cols-1 gap-4 text-sm text-gray-700">
-                            <p><strong>Customer Name:</strong> {order.firstName} {order.lastName}</p>
-                            <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</p>
-                            <p><strong>Address:</strong> {order.address}</p>
-                            <p><strong>Phone:</strong> {order.phone}</p>
-                            <p><strong>Email:</strong> {order.email}</p>
-                            <p><strong>City:</strong> {order.city}</p>
-                            <p><strong>Total Amount:</strong> ${order.total}</p>
-                          </div>
-                          {/* <ul className="mt-4 space-y-2">
+                  <td colSpan={6} className="bg-gray-50 p-4 transition-all animate-fadeIn">
+                    <h3 className="font-bold text-lg text-gray-800 mb-2">Order Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-sm text-gray-700">
+                      <p><strong>Customer Name:</strong> {order.firstName} {order.lastName}</p>
+                      <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</p>
+                      <p><strong>Address:</strong> {order.address}</p>
+                      <p><strong>Phone:</strong> {order.phone}</p>
+                      <p><strong>Email:</strong> {order.email}</p>
+                      <p><strong>City:</strong> {order.city}</p>
+                      <p><strong>Total Amount:</strong> ${order.total}</p>
+                    </div>
+                    <ul className="mt-4 space-y-2">
                             {order.cartItems.map((item, index) => (
                               <li key={`${order._id}-${index}`} className="flex items-center gap-2">
-                                {item.image && (
+                                {item.imageUrl && (
                                   <Image
-                                    // src={urlFor(item.image).url()}
-                                    src={item.image}
+                                    src={urlFor(item.imageUrl).url()}
                                     width={40}
                                     height={40}
                                     alt={item.productName}
@@ -211,17 +212,46 @@ export default function AdminDashboard() {
                                 <span>{item.productName}</span>
                               </li>
                             ))}
-                          </ul> */}
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                          </ul>
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
       </div>
     </ProtectedRoute>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
