@@ -189,7 +189,7 @@ export default function AdminDashboard() {
                     <h3 className="font-bold text-lg text-gray-800 mb-2">Order Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-sm text-gray-700">
                       <p><strong>Customer Name:</strong> {order.firstName} {order.lastName}</p>
-                      <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</p>
+                      {/* <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</p> */}
                       <p><strong>Address:</strong> {order.address}</p>
                       <p><strong>Phone:</strong> {order.phone}</p>
                       <p><strong>Email:</strong> {order.email}</p>
